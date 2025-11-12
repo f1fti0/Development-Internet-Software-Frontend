@@ -1,0 +1,65 @@
+.estimates-button-wrapper {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 1000;
+}
+
+.estimates-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background-color: #ffffff;
+  color: #005ccc;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.estimates-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  color: #005ccc;
+}
+
+.estimates-button.no-active {
+  background-color: #d0d0d0;
+  color: #6c757d;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  cursor: default;
+}
+
+.estimates-button.no-active:hover {
+  transform: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.estimates-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #005ccc;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.bi-bag {
+  font-size: 48px;
+  color: black;
+}
+

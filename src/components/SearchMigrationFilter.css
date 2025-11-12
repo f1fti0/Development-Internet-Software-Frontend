@@ -1,0 +1,59 @@
+.search-filter-input {
+  border-width: 2px ;
+  border-color: #005ccc !important;
+  border-radius: 8px;
+  border-left: none;
+}
+
+.search-filter-input:focus {
+  border-color: #005ccc !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.search-filter-input-group .input-group-text,
+.search-filter-input-group .form-control,
+.search-filter-input-group .btn {
+  border-width: 2px !important;
+  border-color: #005ccc !important;
+}
+
+.search-filter-input-group .form-control:focus,
+.search-filter-input-group .btn:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.search-clear-btn {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-left: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-width: 2px !important;
+  border-color: #005ccc !important;
+  background-color: white !important;
+  color: #6c757d !important;
+}
+
+.search-clear-btn:not(:disabled):hover {
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+}
+
+.search-clear-btn:disabled {
+  background-color: white !important;
+  color: #dee2e6 !important;
+  cursor: not-allowed !important;
+  /* Граница остается такой же как у активной */
+  border-color: #005ccc !important;
+  border-width: 2px !important;
+}
+
+.search-clear-btn,
+.search-clear-btn:disabled,
+.search-clear-btn:not(:disabled) {
+  border-color: #005ccc !important;
+  border-width: 2px !important;
+}

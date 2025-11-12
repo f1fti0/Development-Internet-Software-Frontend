@@ -1,0 +1,41 @@
+.App {
+  min-height: 100vh;
+  position: relative;
+  background-color: #ffffff;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+.container {
+  max-width: 100% !important;
+  padding: 0 30px;
+}
+
+.btn-primary {
+  background-color: #005ccc;
+  border-color: #005ccc;
+}
+
+.btn-primary:hover {
+  background-color: #004ba3;
+  border-color: #004ba3;
+}
+
+.btn-outline-primary:hover {
+  background-color: #005ccc;
+  border-color: #005ccc;
+}
+
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+}
+
+.breadcrumb-item a {
+  color: #005ccc;
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: #6c757d;
+}
