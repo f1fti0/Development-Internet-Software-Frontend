@@ -1,11 +1,12 @@
 import axios from 'axios';
 import type { MigrationMethod, SearchParams, UserMigrationRequest } from './types';
+import { dest_api } from '../../target_config'; 
 
-const API_BASE = '/api';
+const API_BASE = dest_api;
 
 const apiClient = axios.create({
   baseURL: API_BASE,
-  withCredentials: true,
+  withCredentials: false,
   timeout: 10000,
 });
 
@@ -79,15 +80,6 @@ export const migrationAPI = {
         throw new Error('Метод миграции не найден');
       }
       return method;
-    }
-  },
-
-  async addMethodToRequest(__methodId: number): Promise<void> {
-    try {
-      
-    } catch (error) {
-      console.warn('Не удалось добавить метод в заявку:', error);
-      throw error;
     }
   },
 

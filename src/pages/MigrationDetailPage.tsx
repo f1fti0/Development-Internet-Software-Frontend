@@ -6,6 +6,10 @@ import { migrationAPI } from '../modules/api.ts';
 import AppBreadcrumbs from '../components/Breadcrumbs.tsx';
 import defaultImage from '../assets/default-image.jpeg';
 
+import { dest_img } from '../../target_config'; 
+
+const URL_IMAGE = dest_img + '/image-web/'
+
 const MigrationDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [method, setMethod] = useState<MigrationMethod | null>(null);
@@ -55,7 +59,7 @@ const MigrationDetailPage: React.FC = () => {
             <Row className="align-items-start">
               <Col md={6}>
                 <img
-                  src={method.image_url || defaultImage}
+                  src={URL_IMAGE + method.image_url || defaultImage}
                   alt={method.title}
                   className="img-fluid rounded mb-2"
                   style={{ maxHeight: '400px', objectFit: 'cover', width: '100%' }}

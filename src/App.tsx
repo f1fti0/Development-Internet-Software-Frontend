@@ -6,13 +6,23 @@ import MigrationDetailPage from './pages/MigrationDetailPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect } from 'react';
+
 function App() {
-  const basename = import.meta.env.PROD 
-    ? '/Development-Internet-Software-Frontend'
-    : '/';
+  useEffect(()=>{
+    invoke('tauri', {cmd:'create'})
+      .then(() =>{console.log("Start")})
+      .catch(() =>{console.log("Start Error")})
+    return () =>{
+      invoke('tauri', {cmd:'close'})
+        .then(() =>{console.log("Close")})
+        .catch(() =>{console.log("Close Error")})
+    }
+  }, [])
 
   return (
-    <Router basename={basename}>
+    <Router>
       <AppNavbar />
       <div className="App">
         <main className="">

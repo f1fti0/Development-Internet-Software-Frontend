@@ -1,31 +1,33 @@
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa';
-
-import mkcert from 'vite-plugin-mkcert'
-import fs from 'fs';
-import path from 'path';
+import { api_proxy_addr, img_proxy_addr, dest_root } from './target_config';
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/Development-Internet-Software-Frontend/' : '/',
+  base: dest_root,
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
   server: { 
-    https:{
-      key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
-      cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),
-    },
+    host: 'localhost',
+    port: 3000,
     proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
+      "/api": {
+        target: api_proxy_addr,
         changeOrigin: true,
-        secure: false,
-      }
+        rewrite: (path) => path.replace(/^\/api/, "/"),
+      },
+      "/img-proxy": {
+        target: img_proxy_addr,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/img-proxy/, "/"),
+      },
     },
-    host: '192.168.1.141',
-    port: 3000
-   },
+  },
   plugins: [
     react(),
-    mkcert(),
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
@@ -36,9 +38,8 @@ export default defineConfig({
         short_name: 'Миграция',
         description: 'Приложение для управления миграцией данных',
         theme_color: '#005ccc',
-        //start_url: "http://localhost:3000/manifest.json",
-        start_url: "/Development-Internet-Software-Frontend/",
-        scope: "/Development-Internet-Software-Frontend/",
+        start_url: "/",
+        scope: "/",
         display: "standalone",
         orientation: "portrait-primary",
         icons: [
