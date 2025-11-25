@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate  } from 'react-router-dom';
 import './EstimatesButton.css';
 
 interface EstimatesButtonProps {
@@ -7,13 +6,8 @@ interface EstimatesButtonProps {
 }
 
 const EstimatesButton: React.FC<EstimatesButtonProps> = ({ migrationCount }) => {
-  const navigate = useNavigate();
+  const handleClick = () => {
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (migrationCount === 0) {
-      return;
-    }
-    navigate('/estimates');
   };
 
   return (

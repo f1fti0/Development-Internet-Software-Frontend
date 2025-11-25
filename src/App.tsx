@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AppNavbar from './components/Navbar';
 import MigrationHomePage from './pages/MigrationsHomePage';
 import MigrationMethodsPage from './pages/MigrationMethodsPage';
@@ -7,15 +7,20 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
+  const basename = import.meta.env.PROD 
+    ? '/Development-Internet-Software-Frontend'
+    : '/';
+
   return (
-    <Router>
+    <Router basename={basename}>
       <AppNavbar />
       <div className="App">
-        <main className="min-vh-100">
+        <main className="">
           <Routes>
             <Route path="/" element={<MigrationHomePage />} />
             <Route path="/migration-methods/" element={<MigrationMethodsPage />} />
             <Route path="/migration-methods/:id/" element={<MigrationDetailPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>

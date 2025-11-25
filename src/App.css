@@ -1,9 +1,12 @@
 .App {
-  min-height: 100vh;
   position: relative;
   background-color: #ffffff;
-  margin-left: 100px;
-  margin-right: 100px;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+main {
+  min-height: 0vh;
 }
 
 .container {

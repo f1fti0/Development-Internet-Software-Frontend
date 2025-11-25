@@ -5,13 +5,11 @@ import defaultImage from '../assets/default-image.jpeg';
 
 interface MigrationMethodCardProps {
   method: MigrationMethod;
-  onAddToRequest: (methodId: number) => void;
   onViewDetails: (methodId: number) => void;
 }
 
 const MigrationMethodCard: React.FC<MigrationMethodCardProps> = ({ 
-  method, 
-  onAddToRequest, 
+  method,
   onViewDetails 
 }) => {
   return (

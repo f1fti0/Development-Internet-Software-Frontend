@@ -42,7 +42,7 @@ const MigrationDetailPage: React.FC = () => {
   if (!method) return <Container className="mt-4"><Alert variant="danger">Метод не найден</Alert></Container>;
 
   return (
-    <Container className="mt-4">
+    <Container className="px-4 container-fluid">
       <AppBreadcrumbs items={breadcrumbItems} />
       
       <Row className="mb-4">
@@ -57,7 +57,7 @@ const MigrationDetailPage: React.FC = () => {
                 <img
                   src={method.image_url || defaultImage}
                   alt={method.title}
-                  className="img-fluid rounded"
+                  className="img-fluid rounded mb-2"
                   style={{ maxHeight: '400px', objectFit: 'cover', width: '100%' }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = defaultImage;

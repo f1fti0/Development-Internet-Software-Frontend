@@ -32,6 +32,11 @@ export interface MigrationMethodInRequest {
   bandwidth: number | null;
 }
 
+export interface UserMigrationRequest {
+  draft_request_id: number;
+  migration_methods_count: number;
+}
+
 export interface SearchParams {
   text?: string;
 }

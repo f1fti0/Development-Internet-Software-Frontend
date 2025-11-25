@@ -1,73 +1,73 @@
-import React, { useState } from 'react';
-import { Form, Row, Col, Button, InputGroup } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Form, Button, InputGroup } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { 
+    setAppliedSearchTextAction, 
+    clearAppliedSearchTextAction, 
+    useAppliedSearchText 
+} from '../slices/filtersSlice';
 import './SearchMigrationFilter.css';
 
-interface SearchFilterProps {
-  onSearch: (searchText: string) => void;
-  initialValue?: string;
+interface SearchMigrationFilterProps {
+    onSearch: (searchText: string) => void;
 }
 
-const SearchMigrationFilter: React.FC<SearchFilterProps> = ({ onSearch, initialValue = '' }) => {
-  const [searchText, setSearchText] = useState(initialValue);
-  const [hasSearched, setHasSearched] = useState(false);
+const SearchMigrationFilter: React.FC<SearchMigrationFilterProps> = ({ onSearch }) => {
+    const dispatch = useDispatch();
+    const appliedSearchText = useAppliedSearchText();
+    const [localSearchText, setLocalSearchText] = useState(appliedSearchText);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchText);
-    setHasSearched(true);
-  };
+    useEffect(() => {
+        setLocalSearchText(appliedSearchText);
+    }, [appliedSearchText]);
 
-  const handleClear = () => {
-    if (hasSearched) {
-      setSearchText('');
-      onSearch('');
-      setHasSearched(false);
-    }
-    if (searchText.length > 0 && !hasSearched) {
-      setSearchText('');
-    }
-  };
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        dispatch(setAppliedSearchTextAction(localSearchText));
+        onSearch(localSearchText);
+    };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    // Сбрасываем флаг поиска при изменении текста
-    if (hasSearched) {
-      setHasSearched(false);
-    }
-  };
+    const handleClear = () => {
+        setLocalSearchText('');
+        dispatch(clearAppliedSearchTextAction());
+        onSearch('');
+    };
 
-  return (
-    <Form onSubmit={handleSubmit} className="mb-4">
-      <Row className="g-3 align-items-center justify-content-center">
-        <Col md={6}>
-          <InputGroup className="search-filter-input-group">
-            <Form.Control
-              type="text"
-              placeholder="Поиск методов миграции..."
-              value={searchText}
-              onChange={handleInputChange}
-              className="search-filter-input"
-              style={{
-                borderRight: 'none'
-              }}
-            />
-            <Button 
-              variant="outline-secondary" 
-              onClick={handleClear}
-              className="search-clear-btn"
-            >
-              <i className="bi bi-x"></i>
-            </Button>
-          </InputGroup>
-        </Col>
-        <Col md="auto">
-          <Button variant="primary" type="submit">
-            Поиск
-          </Button>
-        </Col>
-      </Row>
-    </Form>
-  );
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalSearchText(e.target.value);
+    };
+
+    return (
+        <Form onSubmit={handleSubmit} className="mb-4 form-group-search">
+            <div className="d-flex flex-nowrap align-items-center gap-3 group-search">
+                <div className="flex-grow-1" style={{ minWidth: '200px' }}>
+                    <InputGroup className="search-filter-input-group">
+                        <Form.Control
+                            type="text"
+                            placeholder="Поиск методов миграции..."
+                            value={localSearchText}
+                            onChange={handleInputChange}
+                            className="search-filter-input"
+                        />
+                        <Button 
+                            variant="outline-secondary" 
+                            onClick={handleClear}
+                            disabled={!localSearchText}
+                            className="search-clear-btn"
+                        >
+                            <i className="bi bi-x"></i>
+                        </Button>
+                    </InputGroup>
+                </div>
+                
+                <div className="flex-shrink-0">
+                    <Button variant="primary" type="submit" className="text-nowrap">
+                        Поиск
+                    </Button>
+                </div>
+            </div>
+        </Form>
+    );
 };
 
 export default SearchMigrationFilter;

@@ -1,7 +1,7 @@
 .estimates-button-wrapper {
   position: fixed;
-  left: 20px;
-  bottom: 20px;
+  left: 10px;
+  bottom: 10px;
   z-index: 1000;
 }
 

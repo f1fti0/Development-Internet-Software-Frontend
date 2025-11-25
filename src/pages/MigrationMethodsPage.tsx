@@ -1,64 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
-import type { MigrationMethod } from '../modules/types';
-import { migrationAPI } from '../modules/api';
 import AppBreadcrumbs from '../components/Breadcrumbs';
 import SearchMigrationFilter from '../components/SearchMigrationFilter';
 import MigrationMethodCard from '../components/MigrationMethodCard';
 import EstimatesButton from '../components/EstimatesButton';
 import { useNavigate } from 'react-router-dom';
+import { useAppliedSearchText } from '../slices/filtersSlice';
+import { useMigrationMethods } from '../hooks/useMigrationMethods';
+import { useUserMigrationRequest } from '../hooks/useUserMigrationRequest';
 
 const MigrationMethodsPage: React.FC = () => {
-  const [methods, setMethods] = useState<MigrationMethod[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   
-  const effectRan = useRef(false);
+  const appliedSearchText = useAppliedSearchText();
+  const { methods, loading: methodsLoading, error: methodsError } = useMigrationMethods(appliedSearchText);
+  const { userRequest, loading: userRequestLoading, error: userRequestError } = useUserMigrationRequest();
 
   const breadcrumbItems = [
     { label: 'Главная', path: '/' },
     { label: 'Методы миграции' }
   ];
 
-  const loadMethods = async (searchText?: string) => {
-    try {
-      setLoading(true);
-      setSearchQuery(searchText || '');
-      
-      const params = searchText ? { text: searchText } : undefined;
-      const data = await migrationAPI.getMigrationMethods(params);
-      setMethods(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleSearch = (__searchQuery: string) => {
 
-  useEffect(() => {
-    if (effectRan.current === false) {
-      loadMethods();
-      effectRan.current = true;
-    }
-  }, []);
-
-  const handleSearch = (searchText: string) => {
-    loadMethods(searchText);
-  };
-
-  const handleAddToRequest = async (methodId: number) => {
-    try {
-
-    } catch (err) {
-      console.error('Ошибка при добавлении в заявку:', err);
-      alert('Не удалось добавить метод в заявку');
-    }
   };
 
   const handleViewDetails = (methodId: number) => {
     navigate(`/migration-methods/${methodId}/`);
   };
+
+  const loading = methodsLoading || userRequestLoading;
+  const error = methodsError || userRequestError;
 
   return (
     <>
@@ -68,9 +40,9 @@ const MigrationMethodsPage: React.FC = () => {
         <Row className="mb-3">
           <Col>
             <h1>Методы миграции</h1>
-            {searchQuery && (
+            {appliedSearchText && (
               <p className="text-muted">
-                Результаты поиска по запросу: "{searchQuery}"
+                Результаты поиска по запросу: "{appliedSearchText}"
               </p>
             )}
           </Col>
@@ -78,19 +50,21 @@ const MigrationMethodsPage: React.FC = () => {
 
         <SearchMigrationFilter onSearch={handleSearch} />
 
+        {error && <Alert variant="danger">{error}</Alert>}
+
         {loading ? (
           <div className="text-center py-4">
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Загрузка...</span>
             </div>
-            <p className="mt-2">Загрузка методов миграции...</p>
+            <p className="mt-2">Загрузка...</p>
           </div>
         ) : (
           <>
             {methods.length === 0 ? (
               <Alert variant="warning">
-                {searchQuery 
-                  ? `Методы миграции по запросу "${searchQuery}" не найдены` 
+                {appliedSearchText 
+                  ? `Методы миграции по запросу "${appliedSearchText}" не найдены` 
                   : 'Методы миграции не найдены'
                 }
               </Alert>
@@ -100,7 +74,6 @@ const MigrationMethodsPage: React.FC = () => {
                   <Col key={method.id} xl={4} lg={4} md={6} className="mb-4">
                     <MigrationMethodCard
                       method={method}
-                      onAddToRequest={handleAddToRequest}
                       onViewDetails={handleViewDetails}
                     />
                   </Col>
@@ -111,7 +84,7 @@ const MigrationMethodsPage: React.FC = () => {
         )}
       </Container>
       
-      <EstimatesButton migrationCount={0} />
+      <EstimatesButton migrationCount={userRequest?.migration_methods_count || 0} />
     </>
   );
 };

@@ -11,6 +11,16 @@
   outline: none !important;
 }
 
+.form-group-search {
+  align-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.group-search {
+  max-width: 600px;
+}
+
 .search-filter-input-group .input-group-text,
 .search-filter-input-group .form-control,
 .search-filter-input-group .btn {
