@@ -20,7 +20,7 @@ export default defineConfig({
         secure: false,
       }
     },
-    host: '192.168.1.141',
+    host: '192.168.56.1',
     port: 3000
    },
   plugins: [
@@ -90,7 +90,7 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 365 дней
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -104,7 +104,7 @@ export default defineConfig({
               cacheName: 'gstatic-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 365 дней
+                maxAgeSeconds: 60 * 60 * 24 * 365
               },
               cacheableResponse: {
                 statuses: [0, 200]

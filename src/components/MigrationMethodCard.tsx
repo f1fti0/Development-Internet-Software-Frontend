@@ -3,6 +3,8 @@ import { Card, Button } from 'react-bootstrap';
 import type { MigrationMethod } from '../modules/types';
 import defaultImage from '../assets/default-image.jpeg';
 
+const URL_IMAGE = 'http://localhost:9000' + '/image-web/'
+
 interface MigrationMethodCardProps {
   method: MigrationMethod;
   onViewDetails: (methodId: number) => void;
@@ -16,7 +18,7 @@ const MigrationMethodCard: React.FC<MigrationMethodCardProps> = ({
     <Card className="h-100 shadow-sm">
       <Card.Img 
         variant="top" 
-        src={method.image_url || defaultImage}
+        src={URL_IMAGE + method.image_url || defaultImage}
         style={{ height: '200px', objectFit: 'cover' }}
         onError={(e) => {
           (e.target as HTMLImageElement).src = defaultImage;
