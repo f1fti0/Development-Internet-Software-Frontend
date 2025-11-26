@@ -42,3 +42,14 @@ main {
 .breadcrumb-item.active {
   color: #6c757d;
 }
+
+.carousel-caption-blur {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px;
+  width: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
