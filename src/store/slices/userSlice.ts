@@ -23,14 +23,12 @@ const initialState: UserState = {
   successMessage: null,
 };
 
-// Асинхронное действие для авторизации
 export const loginUserAsync = createAsyncThunk(
   'user/loginUserAsync',
   async (credentials: UserLogin, { rejectWithValue }) => {
     try {
       const response = await api.user.userLoginCreate(credentials);
       
-      // Получаем полный профиль пользователя после успешного логина
       const profileResponse = await api.user.userProfileList();
       const userData = profileResponse.data as User;
       
@@ -42,7 +40,6 @@ export const loginUserAsync = createAsyncThunk(
   }
 );
 
-// Асинхронное действие для деавторизации
 export const logoutUserAsync = createAsyncThunk(
   'user/logoutUserAsync',
   async (_, { rejectWithValue }) => {
@@ -56,20 +53,17 @@ export const logoutUserAsync = createAsyncThunk(
   }
 );
 
-// Асинхронное действие для регистрации
 export const registerUserAsync = createAsyncThunk(
   'user/registerUserAsync',
   async (userData: UserRegistration, { rejectWithValue }) => {
     try {
       const response = await api.user.userRegisterCreate(userData);
       
-      // После регистрации автоматически логинимся
       const loginResponse = await api.user.userLoginCreate({
         username: userData.username,
         password: userData.password,
       });
       
-      // Получаем профиль
       const profileResponse = await api.user.userProfileList();
       const fullUserData = profileResponse.data as User;
       
@@ -81,20 +75,17 @@ export const registerUserAsync = createAsyncThunk(
   }
 );
 
-// Обновление профиля пользователя
 export const updateProfileAsync = createAsyncThunk(
   'user/updateProfileAsync',
   async (profileData: Partial<User>, { rejectWithValue }) => {
     try {
-      // Создаем объект для отправки без undefined полей
       const dataToSend: any = {};
       if (profileData.first_name !== undefined) dataToSend.first_name = profileData.first_name;
       if (profileData.last_name !== undefined) dataToSend.last_name = profileData.last_name;
       if (profileData.email !== undefined) dataToSend.email = profileData.email;
       
       console.log('Отправка данных профиля:', dataToSend);
-      
-      // Отправляем обновленные данные профиля
+
       const response = await api.user.userProfileUpdate(dataToSend);
       const updatedUser = response.data as UserUpdate;
       
@@ -108,7 +99,6 @@ export const updateProfileAsync = createAsyncThunk(
   }
 );
 
-// Смена пароля
 export const changePasswordAsync = createAsyncThunk(
   'user/changePasswordAsync',
   async (passwordData: {
@@ -123,7 +113,6 @@ export const changePasswordAsync = createAsyncThunk(
         confirm_new_password: '***'
       });
       
-      // Отправляем данные для смены пароля
       const response = await api.user.userProfileUpdate({
         password: passwordData.password,
         new_password: passwordData.new_password,
@@ -137,7 +126,6 @@ export const changePasswordAsync = createAsyncThunk(
     } catch (error: any) {
       console.error('Ошибка при смене пароля:', error.response?.data || error.message);
       
-      // Пытаемся извлечь детальное сообщение об ошибке
       const errorData = error.response?.data;
       let errorMessage = 'Ошибка при смене пароля';
       
@@ -149,7 +137,6 @@ export const changePasswordAsync = createAsyncThunk(
         } else if (errorData.detail) {
           errorMessage = errorData.detail;
         } else if (typeof errorData === 'object') {
-          // Пытаемся извлечь первую ошибку из объекта
           const firstError = Object.values(errorData)[0];
           if (Array.isArray(firstError)) {
             errorMessage = firstError[0];
@@ -174,7 +161,6 @@ const userSlice = createSlice({
     clearSuccessMessage: (state) => {
       state.successMessage = null;
     },
-    // Ручное обновление пользователя (например, при загрузке данных)
     updateUser: (state, action) => {
       if (state.user) {
         state.user = {
@@ -186,7 +172,6 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Логин
       .addCase(loginUserAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -203,7 +188,6 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
       
-      // Логаут
       .addCase(logoutUserAsync.pending, (state) => {
         state.loading = true;
         state.successMessage = null;
@@ -222,7 +206,6 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
       
-      // Регистрация
       .addCase(registerUserAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -238,7 +221,6 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
       
-      // Обновление профиля
       .addCase(updateProfileAsync.pending, (state) => {
         state.updatingProfile = true;
         state.error = null;
@@ -247,7 +229,6 @@ const userSlice = createSlice({
       .addCase(updateProfileAsync.fulfilled, (state, action) => {
         state.updatingProfile = false;
         
-        // Обновляем только измененные поля
         if (state.user) {
           state.user = {
             ...state.user,
@@ -265,7 +246,6 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
       
-      // Смена пароля
       .addCase(changePasswordAsync.pending, (state) => {
         state.updatingPassword = true;
         state.error = null;

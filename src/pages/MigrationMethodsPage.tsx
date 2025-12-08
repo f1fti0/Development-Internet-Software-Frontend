@@ -30,8 +30,7 @@ const MigrationMethodsPage: React.FC = () => {
 
   const handleAddToRequest = (methodId: number) => {
     console.log('Добавление метода в заявку:', methodId);
-    // Здесь будет логика добавления метода в заявку
-    // Например, dispatch(addMethodToRequest(methodId))
+
   };
 
   return (

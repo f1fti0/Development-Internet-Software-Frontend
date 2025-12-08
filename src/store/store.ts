@@ -1,4 +1,3 @@
-// store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import migrationMethodsReducer from './slices/migrationMethodsSlice';
 import migrationMethodDetailReducer from './slices/migrationMethodDetailSlice';

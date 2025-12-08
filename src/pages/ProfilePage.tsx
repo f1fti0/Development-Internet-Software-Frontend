@@ -26,24 +26,20 @@ const ProfilePage: React.FC = () => {
     successMessage 
   } = useSelector((state: RootState) => state.user);
   
-  // Состояния для профиля
   const [profileForm, setProfileForm] = useState({
     first_name: '',
     last_name: '',
     email: '',
   });
   
-  // Состояния для смены пароля
   const [passwordForm, setPasswordForm] = useState({
-    password: '', // Текущий пароль
-    new_password: '', // Новый пароль
-    confirm_new_password: '', // Подтверждение нового пароля
+    password: '',
+    new_password: '',
+    confirm_new_password: '',
   });
   
-  // Состояние для ошибок валидации пароля
   const [passwordValidationError, setPasswordValidationError] = useState('');
   
-  // Инициализация формы данными пользователя
   useEffect(() => {
     if (user) {
       setProfileForm({
@@ -54,14 +50,12 @@ const ProfilePage: React.FC = () => {
     }
   }, [user]);
   
-  // Редирект, если не авторизован
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login/');
     }
   }, [isAuthenticated, navigate]);
   
-  // Очистка сообщений при размонтировании
   useEffect(() => {
     return () => {
       dispatch(clearError());
@@ -80,7 +74,6 @@ const ProfilePage: React.FC = () => {
       ...profileForm,
       [name]: value
     });
-    // Очищаем ошибки при изменении
     if (error) dispatch(clearError());
   };
   
@@ -90,9 +83,7 @@ const ProfilePage: React.FC = () => {
       ...passwordForm,
       [name]: value
     });
-    // Очищаем ошибки при изменении
     if (error) dispatch(clearError());
-    // Очищаем ошибки валидации
     if (passwordValidationError) setPasswordValidationError('');
   };
   
@@ -100,7 +91,6 @@ const ProfilePage: React.FC = () => {
     e.preventDefault();
     dispatch(clearError());
     
-    // Подготавливаем данные для отправки (убираем пустые строки)
     const dataToSend: any = {};
     if (profileForm.first_name.trim()) dataToSend.first_name = profileForm.first_name;
     if (profileForm.last_name.trim()) dataToSend.last_name = profileForm.last_name;
@@ -116,7 +106,6 @@ const ProfilePage: React.FC = () => {
     dispatch(clearError());
     setPasswordValidationError('');
     
-    // Валидация на клиенте
     if (!passwordForm.password) {
       setPasswordValidationError('Введите текущий пароль');
       return;
@@ -148,7 +137,6 @@ const ProfilePage: React.FC = () => {
       confirm_new_password: passwordForm.confirm_new_password,
     }));
     
-    // Очищаем форму после успешной отправки (если нет ошибки)
     if (!error) {
       setPasswordForm({
         password: '',

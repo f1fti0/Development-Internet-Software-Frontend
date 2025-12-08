@@ -41,7 +41,6 @@ const RegisterPage: React.FC = () => {
       [name]: value
     }));
     
-    // Проверка совпадения паролей
     if (name === 'password_confirm' || name === 'password') {
       if (name === 'password_confirm' && value !== formData.password) {
         setPasswordError('Пароли не совпадают');
