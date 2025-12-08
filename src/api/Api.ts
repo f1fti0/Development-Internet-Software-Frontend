@@ -98,15 +98,13 @@ export interface UserLogin {
   password: string;
 }
 
-export interface User {
+export interface UserUpdate {
   /** ID */
   id?: number;
   /**
    * Username
    * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
    * @minLength 1
-   * @maxLength 150
-   * @pattern ^[\w.@+-]+$
    */
   username?: string;
   /**
@@ -125,6 +123,18 @@ export interface User {
    * @maxLength 150
    */
   last_name?: string | null;
+  /**
+   * Password
+   * @minLength 8
+   */
+  password?: string;
+  /**
+   * New password
+   * @minLength 8
+   */
+  new_password?: string;
+  /** Confirm new password */
+  confirm_new_password?: string;
 }
 
 export interface UserRegistration {
@@ -709,8 +719,8 @@ export class Api<
      * @request PUT:/user/profile/
      * @secure
      */
-    userProfileUpdate: (data: User, params: RequestParams = {}) =>
-      this.request<User, any>({
+    userProfileUpdate: (data: UserUpdate, params: RequestParams = {}) =>
+      this.request<UserUpdate, any>({
         path: `/user/profile/`,
         method: "PUT",
         body: data,

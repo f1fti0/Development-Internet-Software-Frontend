@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store/store';
@@ -54,18 +54,22 @@ const AppNavbar: React.FC = () => {
               </div>
             ) : isAuthenticated ? (
               <>
-                <Navbar.Text className="me-3">
-                  <i className="bi bi-person-circle me-1"></i>
-                  {getUserDisplayName()}
-                </Navbar.Text>
-                <Button 
-                  variant="outline-secondary" 
-                  size="sm"
-                  onClick={handleLogout}
-                  disabled={loading}
-                >
-                  Выйти
-                </Button>
+                {/* Dropdown для пользователя */}
+                <Dropdown align="end">
+                  <Dropdown.Toggle as={Navbar.Text} className="d-flex align-items-center cursor-pointer" style={{ cursor: 'pointer' }}>
+                    <i className="bi bi-person-circle me-1"></i>
+                    {getUserDisplayName()}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link} to="/profile/">
+                      Личный кабинет
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={handleLogout} disabled={loading}>
+                      Выйти
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </>
             ) : (
               <>
