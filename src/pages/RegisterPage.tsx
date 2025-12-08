@@ -1,4 +1,3 @@
-// pages/RegisterPage.tsx
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,14 +22,12 @@ const RegisterPage: React.FC = () => {
 
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  // Если уже авторизован, перенаправляем на главную
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
-  // Очищаем ошибку при размонтировании
   useEffect(() => {
     return () => {
       dispatch(clearError());

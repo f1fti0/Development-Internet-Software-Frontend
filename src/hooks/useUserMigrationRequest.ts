@@ -1,4 +1,3 @@
-// hooks/useUserMigrationRequest.ts
 import { useState, useEffect } from 'react';
 import { api } from '../api/config';
 import type { UserMigrationRequest } from '../modules/types';

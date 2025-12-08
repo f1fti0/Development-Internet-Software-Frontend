@@ -1,10 +1,9 @@
-// components/Navbar.tsx
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store/store';
-import { logoutUserAsync, getUserProfileAsync } from '../store/slices/userSlice';
+import { logoutUserAsync } from '../store/slices/userSlice';
 
 const AppNavbar: React.FC = () => {
   const navigate = useNavigate();
@@ -12,17 +11,25 @@ const AppNavbar: React.FC = () => {
   
   const { user, isAuthenticated, loading } = useSelector((state: RootState) => state.user);
   
-  // При монтировании компонента проверяем авторизацию
-  useEffect(() => {
-    dispatch(getUserProfileAsync());
-  }, [dispatch]);
-
   const handleLogout = async () => {
     await dispatch(logoutUserAsync());
     navigate('/');
   };
 
-  const displayName = user?.first_name || user?.username || 'Пользователь';
+  const getUserDisplayName = () => {
+    if (!user) return 'Пользователь';
+    
+    if (user.first_name && user.last_name) {
+      return `${user.first_name} ${user.last_name}`;
+    } else if (user.first_name) {
+      return user.first_name;
+    } else if (user.last_name) {
+      return user.last_name;
+    } else if (user.username) {
+      return user.username;
+    }
+    return 'Пользователь';
+  };
 
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm mb-4">
@@ -49,7 +56,7 @@ const AppNavbar: React.FC = () => {
               <>
                 <Navbar.Text className="me-3">
                   <i className="bi bi-person-circle me-1"></i>
-                  {displayName}
+                  {getUserDisplayName()}
                 </Navbar.Text>
                 <Button 
                   variant="outline-secondary" 

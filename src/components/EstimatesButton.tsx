@@ -18,10 +18,7 @@ const EstimatesButton: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="estimates-button-wrapper">
-        <div className="estimates-button loading">
-          <i className="bi bi-hourglass-split"></i>
-        </div>
+      <div>
       </div>
     );
   }

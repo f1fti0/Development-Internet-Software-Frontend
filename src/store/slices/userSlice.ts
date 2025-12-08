@@ -1,4 +1,3 @@
-// store/slices/userSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../api/config';
 import type { User, UserLogin, UserRegistration } from '../../modules/types';
@@ -17,25 +16,23 @@ const initialState: UserState = {
   error: null,
 };
 
-// Асинхронное действие для авторизации
 export const loginUserAsync = createAsyncThunk(
   'user/loginUserAsync',
   async (credentials: UserLogin, { rejectWithValue }) => {
     try {
       const response = await api.user.userLoginCreate(credentials);
       
-      // Предполагаем, что бэкенд возвращает данные пользователя
-      // Если нет, создаем минимальный объект пользователя
-      const userData = response.data as User;
+      const profileResponse = await api.user.userProfileList();
+      const userData = profileResponse.data as User;
       
+      // НЕ СОХРАНЯЕМ В localStorage
       return userData;
     } catch (error: any) {
-      return rejectWithValue('Ошибка авторизации');
+      return rejectWithValue('Ошибка авторизации. Проверьте логин и пароль.');
     }
   }
 );
 
-// Асинхронное действие для деавторизации
 export const logoutUserAsync = createAsyncThunk(
   'user/logoutUserAsync',
   async (_, { rejectWithValue }) => {
@@ -48,28 +45,38 @@ export const logoutUserAsync = createAsyncThunk(
   }
 );
 
-// Асинхронное действие для регистрации
 export const registerUserAsync = createAsyncThunk(
   'user/registerUserAsync',
   async (userData: UserRegistration, { rejectWithValue }) => {
     try {
       const response = await api.user.userRegisterCreate(userData);
-      return response.data as User;
+      
+      const loginResponse = await api.user.userLoginCreate({
+        username: userData.username,
+        password: userData.password,
+      });
+      
+      const profileResponse = await api.user.userProfileList();
+      const fullUserData = profileResponse.data as User;
+      
+      // НЕ СОХРАНЯЕМ В localStorage
+      return fullUserData;
     } catch (error: any) {
       return rejectWithValue('Ошибка регистрации');
     }
   }
 );
 
-// Получение профиля пользователя
-export const getUserProfileAsync = createAsyncThunk(
-  'user/getUserProfileAsync',
+export const checkSessionAsync = createAsyncThunk(
+  'user/checkSessionAsync',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.user.userProfileList();
-      return response.data as User;
+      const profileResponse = await api.user.userProfileList();
+      const userData = profileResponse.data as User;
+      
+      return { user: userData, isAuthenticated: true };
     } catch (error: any) {
-      return rejectWithValue('Ошибка загрузки профиля');
+      return rejectWithValue('Сессия истекла');
     }
   }
 );
@@ -84,7 +91,20 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Логин
+      .addCase(checkSessionAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkSessionAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.isAuthenticated = action.payload.isAuthenticated;
+      })
+      .addCase(checkSessionAsync.rejected, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+      })
+      
       .addCase(loginUserAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -100,7 +120,6 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
       
-      // Логаут
       .addCase(logoutUserAsync.pending, (state) => {
         state.loading = true;
       })
@@ -113,9 +132,10 @@ const userSlice = createSlice({
       .addCase(logoutUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.user = null;
+        state.isAuthenticated = false;
       })
       
-      // Регистрация
       .addCase(registerUserAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -128,20 +148,6 @@ const userSlice = createSlice({
       .addCase(registerUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      })
-      
-      // Получение профиля
-      .addCase(getUserProfileAsync.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(getUserProfileAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-      })
-      .addCase(getUserProfileAsync.rejected, (state) => {
-        state.loading = false;
-        state.isAuthenticated = false;
       });
   },
 });
