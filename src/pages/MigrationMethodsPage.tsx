@@ -1,36 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import AppBreadcrumbs from '../components/Breadcrumbs';
 import SearchMigrationFilter from '../components/SearchMigrationFilter';
 import MigrationMethodCard from '../components/MigrationMethodCard';
 import EstimatesButton from '../components/EstimatesButton';
-import { useNavigate } from 'react-router-dom';
-import { useAppliedSearchText } from '../slices/filtersSlice';
-import { useMigrationMethods } from '../hooks/useMigrationMethods';
-import { useUserMigrationRequest } from '../hooks/useUserMigrationRequest';
+import { getMigrationMethods } from '../store/slices/migrationMethodsSlice';
+import type { RootState, AppDispatch } from '../store/store';
 
 const MigrationMethodsPage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   
-  const appliedSearchText = useAppliedSearchText();
-  const { methods, loading: methodsLoading, error: methodsError } = useMigrationMethods(appliedSearchText);
-  const { userRequest, loading: userRequestLoading, error: userRequestError } = useUserMigrationRequest();
+  const { searchValue, methods, loading } = useSelector((state: RootState) => state.migrationMethods);
+  
+  useEffect(() => {
+    dispatch(getMigrationMethods());
+  }, [dispatch]);
 
   const breadcrumbItems = [
     { label: 'Главная', path: '/' },
     { label: 'Методы миграции' }
   ];
 
-  const handleSearch = (__searchQuery: string) => {
-
-  };
-
   const handleViewDetails = (methodId: number) => {
     navigate(`/migration-methods/${methodId}/`);
   };
-
-  const loading = methodsLoading || userRequestLoading;
-  const error = methodsError || userRequestError;
 
   return (
     <>
@@ -40,31 +36,40 @@ const MigrationMethodsPage: React.FC = () => {
         <Row className="mb-3">
           <Col>
             <h1>Методы миграции</h1>
-            {appliedSearchText && (
+            {searchValue && (
               <p className="text-muted">
-                Результаты поиска по запросу: "{appliedSearchText}"
+                Результаты поиска по запросу: "{searchValue}"
+                {methods.length > 0 && (
+                  <span className="ms-2">({methods.length} найдено)</span>
+                )}
+              </p>
+            )}
+            {!searchValue && methods.length > 0 && (
+              <p className="text-muted">
+                Всего методов: {methods.length}
               </p>
             )}
           </Col>
         </Row>
 
-        <SearchMigrationFilter onSearch={handleSearch} />
-
-        {error && <Alert variant="danger">{error}</Alert>}
+        <SearchMigrationFilter 
+          value={searchValue}
+          loading={loading}
+        />
 
         {loading ? (
           <div className="text-center py-4">
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Загрузка...</span>
             </div>
-            <p className="mt-2">Загрузка...</p>
+            <p className="mt-2">Загрузка методов миграции...</p>
           </div>
         ) : (
           <>
             {methods.length === 0 ? (
               <Alert variant="warning">
-                {appliedSearchText 
-                  ? `Методы миграции по запросу "${appliedSearchText}" не найдены` 
+                {searchValue 
+                  ? `Методы миграции по запросу "${searchValue}" не найдены` 
                   : 'Методы миграции не найдены'
                 }
               </Alert>
@@ -74,7 +79,7 @@ const MigrationMethodsPage: React.FC = () => {
                   <Col key={method.id} xl={4} lg={4} md={6} className="mb-4">
                     <MigrationMethodCard
                       method={method}
-                      onViewDetails={handleViewDetails}
+                      onViewDetails={() => handleViewDetails(method.id!)}
                     />
                   </Col>
                 ))}
@@ -84,7 +89,7 @@ const MigrationMethodsPage: React.FC = () => {
         )}
       </Container>
       
-      <EstimatesButton migrationCount={userRequest?.migration_methods_count || 0} />
+      <EstimatesButton />
     </>
   );
 };

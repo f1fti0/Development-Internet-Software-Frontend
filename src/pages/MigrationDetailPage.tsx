@@ -1,41 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
-import type { MigrationMethod } from '../modules/types.ts';
-import { migrationAPI } from '../modules/api.ts';
-import AppBreadcrumbs from '../components/Breadcrumbs.tsx';
+import { useDispatch, useSelector } from 'react-redux';
+import AppBreadcrumbs from '../components/Breadcrumbs';
 import defaultImage from '../assets/default-image.jpeg';
+import { getMigrationMethodDetail, clearMethod } from '../store/slices/migrationMethodDetailSlice';
+import type { AppDispatch, RootState } from '../store/store';
+
+const URL_IMAGE = 'http://localhost:9000' + '/image-web/'
 
 const MigrationDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [method, setMethod] = useState<MigrationMethod | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  
+  const { method, loading, error } = useSelector((state: RootState) => state.migrationMethodDetail);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getMigrationMethodDetail(Number(id)));
+    }
+    
+    return () => {
+      dispatch(clearMethod());
+    };
+  }, [dispatch, id]);
 
   const breadcrumbItems = [
     { label: 'Главная', path: '/' },
     { label: 'Методы миграции', path: '/migration-methods/' },
     { label: method?.title || 'Детали' }
   ];
-
-  useEffect(() => {
-    const loadMethod = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        const data = await migrationAPI.getMigrationMethod(Number(id));
-        setMethod(data);
-        setError(null);
-      } catch (err) {
-        setError('Не удалось загрузить детали метода миграции');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMethod();
-  }, [id]);
 
   if (loading) return <Container className="mt-4">Загрузка...</Container>;
   if (error) return <Container className="mt-4"><Alert variant="danger">{error}</Alert></Container>;
@@ -55,7 +49,7 @@ const MigrationDetailPage: React.FC = () => {
             <Row className="align-items-start">
               <Col md={6}>
                 <img
-                  src={method.image_url || defaultImage}
+                  src={URL_IMAGE + method.image_url || defaultImage}
                   alt={method.title}
                   className="img-fluid rounded mb-2"
                   style={{ maxHeight: '400px', objectFit: 'cover', width: '100%' }}

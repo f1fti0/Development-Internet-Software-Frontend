@@ -1,5 +1,6 @@
+// hooks/useUserMigrationRequest.ts
 import { useState, useEffect } from 'react';
-import { migrationAPI } from '../modules/api';
+import { api } from '../api/config';
 import type { UserMigrationRequest } from '../modules/types';
 
 export const useUserMigrationRequest = () => {
@@ -11,11 +12,17 @@ export const useUserMigrationRequest = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await migrationAPI.getUserMigrationRequest();
-      setUserRequest(data);
+      
+      const response = await api.migrationRequests.migrationRequestsUserList();
+      
+      setUserRequest(response.data as unknown as UserMigrationRequest);
     } catch (err) {
-      setError('Не удалось загрузить данные о заказе');
-      console.error(err);
+      console.warn('Ошибка при загрузке данных о заказе, используется mock:', err);
+      
+      setUserRequest({
+        draft_request_id: -1,
+        migration_methods_count: 0
+      });
     } finally {
       setLoading(false);
     }
