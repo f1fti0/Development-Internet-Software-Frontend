@@ -195,7 +195,6 @@ const ProfilePage: React.FC = () => {
       )}
       
       <Row className="g-4">
-        {/* Информация о пользователе */}
         <Col lg={4}>
           <Card className="shadow-sm h-100">
             <Card.Body className="text-center">
@@ -237,10 +236,8 @@ const ProfilePage: React.FC = () => {
           </Card>
         </Col>
         
-        {/* Формы редактирования */}
         <Col lg={8}>
           <Row className="g-4">
-            {/* Редактирование профиля */}
             <Col md={12}>
               <Card className="shadow-sm">
                 <Card.Body>
@@ -302,7 +299,6 @@ const ProfilePage: React.FC = () => {
               </Card>
             </Col>
             
-            {/* Смена пароля */}
             <Col md={12}>
               <Card className="shadow-sm">
                 <Card.Body>

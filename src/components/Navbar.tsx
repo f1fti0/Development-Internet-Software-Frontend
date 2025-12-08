@@ -45,6 +45,12 @@ const AppNavbar: React.FC = () => {
             <Nav.Link as={Link} to="/migration-methods/">
               Методы миграции
             </Nav.Link>
+            
+            {isAuthenticated && !loading && (
+              <Nav.Link as={Link} to="/migration-requests/">
+                Мои заявки
+              </Nav.Link>
+            )}
           </Nav>
           
           <Nav className="align-items-center">
@@ -54,7 +60,6 @@ const AppNavbar: React.FC = () => {
               </div>
             ) : isAuthenticated ? (
               <>
-                {/* Dropdown для пользователя */}
                 <Dropdown align="end">
                   <Dropdown.Toggle as={Navbar.Text} className="d-flex align-items-center cursor-pointer" style={{ cursor: 'pointer' }}>
                     <i className="bi bi-person-circle me-1"></i>
@@ -64,7 +69,7 @@ const AppNavbar: React.FC = () => {
                     <Dropdown.Item as={Link} to="/profile/">
                       Личный кабинет
                     </Dropdown.Item>
-                    <Dropdown.Divider />
+                  
                     <Dropdown.Item onClick={handleLogout} disabled={loading}>
                       Выйти
                     </Dropdown.Item>

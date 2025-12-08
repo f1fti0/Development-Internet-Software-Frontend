@@ -1,10 +1,10 @@
-// components/MigrationMethodCard.tsx
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import type { MigrationMethod } from '../modules/types';
+import type { RootState, AppDispatch } from '../store/store';
+import { addMethodToDraft } from '../store/slices/migrationRequestsSlice';
 import defaultImage from '../assets/default-image.jpeg';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../store/store';
 
 const URL_IMAGE = 'http://localhost:9000' + '/image-web/';
 
@@ -19,12 +19,26 @@ const MigrationMethodCard: React.FC<MigrationMethodCardProps> = ({
   onViewDetails,
   onAddToRequest
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
 
-  const handleAddToRequest = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Предотвращаем всплытие события
-    if (onAddToRequest && method.id) {
-      onAddToRequest(method.id);
+  const handleAddToRequest = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      alert('Для добавления в заявку необходимо авторизоваться');
+      return;
+    }
+    
+    if (method.id) {
+      try {
+        await dispatch(addMethodToDraft(method.id)).unwrap();
+        if (onAddToRequest) {
+          onAddToRequest(method.id);
+        }
+      } catch (error) {
+        alert('Ошибка при добавлении метода в заявку');
+      }
     }
   };
 

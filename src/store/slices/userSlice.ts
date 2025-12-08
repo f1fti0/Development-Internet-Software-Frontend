@@ -30,7 +30,7 @@ export const loginUserAsync = createAsyncThunk(
       const response = await api.user.userLoginCreate(credentials);
       
       const profileResponse = await api.user.userProfileList();
-      const userData = profileResponse.data as User;
+      const userData = profileResponse.data as unknown as User;
       
       return userData;
     } catch (error: any) {
@@ -65,7 +65,7 @@ export const registerUserAsync = createAsyncThunk(
       });
       
       const profileResponse = await api.user.userProfileList();
-      const fullUserData = profileResponse.data as User;
+      const fullUserData = profileResponse.data as unknown as User;
       
       return fullUserData;
     } catch (error: any) {

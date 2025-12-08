@@ -12,13 +12,18 @@ const EstimatesButton: React.FC = () => {
   
   const handleClick = () => {
     if (hasDraft) {
-      navigate(`/migration-requests/${userRequest?.draft_request_id}/`);
+      navigate(`/estimates/${userRequest?.draft_request_id}/`, {
+        state: { source: 'methods' } 
+      });
     }
   };
 
   if (loading) {
     return (
-      <div>
+      <div className="estimates-button-wrapper">
+        <div className="estimates-button no-active">
+          <i className="bi bi-bag"></i>
+        </div>
       </div>
     );
   }

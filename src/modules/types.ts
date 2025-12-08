@@ -1,3 +1,32 @@
+export interface MigrationRequestDetail {
+  id?: number;
+  status?: 'DRAFT' | 'DELETED' | 'FORMED' | 'COMPLETED' | 'REJECTED';
+  creation_datetime?: string;
+  formation_datetime?: string | null;
+  completion_datetime?: string | null;
+  client?: number;
+  client_username?: string;
+  manager?: number | null;
+  manager_username?: string | null;
+  amount_data?: string | null;
+  result_migration_time?: string | null;
+}
+
+export interface MigrationRequestWithMethods {
+  migration_request: MigrationRequestDetail;
+  migration_methods: MigrationMethodInRequest[];
+}
+
+export interface MigrationMethodInRequest {
+  id?: number;
+  migration_request?: number;
+  migration_method?: number;
+  bandwidth?: string | null;
+  migration_method_title?: string;
+  migration_method_factor?: number;
+  migration_method_image_url?: string | null;
+}
+
 export interface MigrationMethod {
   id?: number;
   title: string;
@@ -46,17 +75,8 @@ export interface MigrationRequestAction {
   action: 'complete' | 'reject';
 }
 
-export interface MigrationMethodInRequest {
-  id?: number;
-  migration_request?: number;
-  migration_method?: number;
-  bandwidth?: string | null;
-  migration_method_title?: string;
-  migration_method_factor?: number;
-}
-
 export interface MigrationMethodInRequestCreate {
-  bandwidth: number;
+  bandwidth: string;
 }
 
 export interface UserMigrationRequest {
