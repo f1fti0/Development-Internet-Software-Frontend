@@ -1,24 +1,38 @@
+// components/MigrationMethodCard.tsx
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import type { MigrationMethod } from '../modules/types';
 import defaultImage from '../assets/default-image.jpeg';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store/store';
 
-const URL_IMAGE = 'http://localhost:9000' + '/image-web/'
+const URL_IMAGE = 'http://localhost:9000' + '/image-web/';
 
 interface MigrationMethodCardProps {
   method: MigrationMethod;
   onViewDetails: (methodId: number) => void;
+  onAddToRequest?: (methodId: number) => void;
 }
 
 const MigrationMethodCard: React.FC<MigrationMethodCardProps> = ({ 
   method,
-  onViewDetails 
+  onViewDetails,
+  onAddToRequest
 }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.user);
+
+  const handleAddToRequest = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Предотвращаем всплытие события
+    if (onAddToRequest && method.id) {
+      onAddToRequest(method.id);
+    }
+  };
+
   return (
     <Card className="h-100 shadow-sm">
       <Card.Img 
         variant="top" 
-        src={URL_IMAGE + method.image_url || defaultImage}
+        src={method.image_url ? URL_IMAGE + method.image_url : defaultImage}
         style={{ height: '200px', objectFit: 'cover' }}
         onError={(e) => {
           (e.target as HTMLImageElement).src = defaultImage;
@@ -49,10 +63,20 @@ const MigrationMethodCard: React.FC<MigrationMethodCardProps> = ({
           <Button
             variant="outline-primary"
             size="sm"
-            onClick={() => onViewDetails(method.id)}
+            onClick={() => onViewDetails(method.id!)}
           >
             Подробнее
           </Button>
+          
+          {isAuthenticated && method.id && onAddToRequest && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleAddToRequest}
+            >
+              Добавить в заявку
+            </Button>
+          )}
         </div>
       </Card.Body>
     </Card>

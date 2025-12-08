@@ -28,6 +28,12 @@ const MigrationMethodsPage: React.FC = () => {
     navigate(`/migration-methods/${methodId}/`);
   };
 
+  const handleAddToRequest = (methodId: number) => {
+    console.log('Добавление метода в заявку:', methodId);
+    // Здесь будет логика добавления метода в заявку
+    // Например, dispatch(addMethodToRequest(methodId))
+  };
+
   return (
     <>
       <Container fluid className="px-4">
@@ -80,6 +86,7 @@ const MigrationMethodsPage: React.FC = () => {
                     <MigrationMethodCard
                       method={method}
                       onViewDetails={() => handleViewDetails(method.id!)}
+                      onAddToRequest={handleAddToRequest}
                     />
                   </Col>
                 ))}
