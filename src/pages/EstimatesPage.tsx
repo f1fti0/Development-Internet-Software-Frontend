@@ -36,22 +36,18 @@ const EstimatesPage: React.FC = () => {
   
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
 
-  const source = location.state?.source || 'methods'; // По умолчанию 'methods'
+  const source = location.state?.source || 'methods';
   
-  // Состояние для редактирования объема данных
   const [amountData, setAmountData] = useState<string>('');
   
-  // Состояние для редактирования пропускной способности методов
   const [bandwidthValues, setBandwidthValues] = useState<Record<number, string>>({});
 
-  // Загружаем заявку при монтировании
   useEffect(() => {
     if (id && isAuthenticated) {
       dispatch(getMigrationRequest(id));
     }
   }, [dispatch, id, isAuthenticated]);
 
-  // Очищаем сообщения при размонтировании компонента
   useEffect(() => {
     return () => {
       dispatch(clearError());
@@ -60,7 +56,6 @@ const EstimatesPage: React.FC = () => {
     };
   }, [dispatch]);
 
-  // Инициализируем значения при загрузке данных
   useEffect(() => {
     if (request) {
       setAmountData(request.amount_data || '');
@@ -77,7 +72,6 @@ const EstimatesPage: React.FC = () => {
     }
   }, [request, methods]);
 
-  // Редирект, если не авторизован
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login/');
@@ -114,7 +108,6 @@ const EstimatesPage: React.FC = () => {
       const bandwidthValue = bandwidthValues[migrationMethodId];
       if (!bandwidthValue || bandwidthValue.trim() === '') {
         dispatch(clearError());
-        // Установка ошибки напрямую в стор
         dispatch({ type: 'migrationRequests/setError', payload: 'Введите значение пропускной способности' });
         return;
       }
@@ -171,7 +164,6 @@ const EstimatesPage: React.FC = () => {
     );
   }
 
-  // Функция для отображения статуса заявки
   const getStatusText = (status?: string) => {
     switch (status) {
       case 'DRAFT': return 'Черновик';
@@ -244,7 +236,7 @@ const EstimatesPage: React.FC = () => {
         <Col>
           <Card className="shadow-sm">
             <Card.Body>
-              <Card.Title className="mb-3">Дополнительная информация</Card.Title>
+              <Card.Title className="mb-3">Информация о заявке</Card.Title>
               
               <Row className="g-4">
                 <Col md={3}>
@@ -446,7 +438,7 @@ const EstimatesPage: React.FC = () => {
                                   value={bandwidthValues[method.migration_method!] || ''}
                                   onChange={(e) => handleBandwidthChange(method.migration_method!, e.target.value)}
                                   placeholder="Введите пропускную способность"
-                                  style={{ width: '150px' }}
+                                  style={{ width: '300px' }}
                                   step="0.01"
                                   min="0"
                                 />
@@ -469,9 +461,8 @@ const EstimatesPage: React.FC = () => {
                                 variant="outline-danger" 
                                 size="sm"
                                 onClick={() => handleDeleteMethod(method.migration_method!)}
-                                className="w-100"
                               >
-                                Удалить из заявки
+                                Удалить
                               </Button>
                             </td>
                           )}
