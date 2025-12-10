@@ -91,6 +91,7 @@ export interface User {
   first_name?: string | null;
   last_name?: string | null;
   date_joined?: string;
+  is_staff?: boolean;
 }
 
 export interface UserLogin {
