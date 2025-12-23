@@ -40,25 +40,20 @@ const initialState: MigrationRequestsListState = {
   processingRequestId: null,
 };
 
-// Получение списка заявок с фильтрами
 export const getMigrationRequestsList = createAsyncThunk(
   'migrationRequestsList/getMigrationRequestsList',
   async (params: GetMigrationRequestsParams = {}, { rejectWithValue }) => {
     try {
-      // Собираем query параметры
       const queryParams: Record<string, string> = {};
       if (params.status) queryParams.status = params.status;
       if (params.start_date) queryParams.start_date = params.start_date;
       if (params.end_date) queryParams.end_date = params.end_date;
-      
-      console.log('Отправка запроса с фильтрами:', queryParams);
       
       const response = await api.migrationRequests.migrationRequestsList({
         query: queryParams
       });
       
       const data = response.data as unknown as MigrationRequestDetail[];
-      console.log('Получены данные:', data);
       return { data, filters: params };
     } catch (error: any) {
       console.error('Ошибка при загрузке списка заявок:', error);
@@ -68,22 +63,17 @@ export const getMigrationRequestsList = createAsyncThunk(
   }
 );
 
-// Завершение или отклонение заявки
 export const completeMigrationRequest = createAsyncThunk(
   'migrationRequestsList/completeMigrationRequest',
   async ({ requestId, action }: CompleteMigrationRequestParams, { rejectWithValue, dispatch }) => {
     try {
-      // Создаем объект action для body
       const actionData: MigrationRequestAction = { action };
-      
-      console.log('Отправка действия:', { requestId, action: actionData });
       
       const response = await api.migrationRequests.migrationRequestsCompleteUpdate(
         requestId,
         actionData
       );
       
-      // После успешного действия перезагружаем список заявок с текущими фильтрами
       await dispatch(getMigrationRequestsList());
       
       return { requestId, action, data: response.data };

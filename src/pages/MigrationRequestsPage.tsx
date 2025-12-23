@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Table, Button, Badge, Alert, Form, Card } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,8 +36,18 @@ const MigrationRequestsPage: React.FC = () => {
   });
   
   const isStaff = user?.is_staff || false;
+  
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const currentFiltersRef = useRef(filters);
 
-  // Инициализация фильтров и загрузка данных при монтировании
+  useEffect(() => {
+    currentFiltersRef.current = filters;
+  }, [filters]);
+
+  const loadRequestsWithCurrentFilters = () => {
+    dispatch(getMigrationRequestsList(currentFiltersRef.current));
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       setLocalFilters(filters);
@@ -45,7 +55,6 @@ const MigrationRequestsPage: React.FC = () => {
     }
   }, [dispatch, isAuthenticated]);
 
-  // Очищаем сообщения при размонтировании компонента
   useEffect(() => {
     return () => {
       dispatch(clearError());
@@ -54,15 +63,32 @@ const MigrationRequestsPage: React.FC = () => {
     };
   }, [dispatch]);
 
-  // Редирект, если не авторизован
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login/');
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    if (isStaff && isAuthenticated) {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+      
+      pollingIntervalRef.current = setInterval(() => {
+        loadRequestsWithCurrentFilters();
+      }, 10000);
+      
+      return () => {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+        }
+      };
+    }
+  }, [isStaff, isAuthenticated]);
+
   const loadRequests = (params = filters) => {
-    console.log('Загрузка запросов с параметрами:', params);
     dispatch(getMigrationRequestsList(params));
   };
 
@@ -76,25 +102,17 @@ const MigrationRequestsPage: React.FC = () => {
 
   const handleApplyFilters = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Применяем фильтры:', localFilters);
     
-    // Устанавливаем фильтры в Redux
     dispatch(setFilters(localFilters));
     
-    // Загружаем заявки с новыми фильтрами
     loadRequests(localFilters);
   };
 
   const handleResetFilters = () => {
-    console.log('Сброс фильтров');
-    
-    // Сбрасываем фильтры в Redux
     dispatch(resetFilters());
     
-    // Сбрасываем локальные фильтры
     setLocalFilters({ status: '', start_date: '', end_date: '' });
     
-    // Загружаем заявки без фильтров
     loadRequests({
       status: '',
       start_date: '',
@@ -102,11 +120,23 @@ const MigrationRequestsPage: React.FC = () => {
     });
   };
 
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleCompleteRequest = async (requestId: number) => {
     await dispatch(completeMigrationRequest({
       requestId: requestId.toString(),
       action: 'complete'
     }));
+    
+    if (isStaff) {
+      loadRequestsWithCurrentFilters();
+    }
   };
 
   const handleRejectRequest = async (requestId: number) => {
@@ -114,6 +144,10 @@ const MigrationRequestsPage: React.FC = () => {
       requestId: requestId.toString(),
       action: 'reject'
     }));
+    
+    if (isStaff) {
+      loadRequestsWithCurrentFilters();
+    }
   };
 
   const breadcrumbItems = [
@@ -144,13 +178,13 @@ const MigrationRequestsPage: React.FC = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Не указана';
     const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
+    return date.toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    }) + ' ' + date.toLocaleDateString('ru-RU', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    }) + ' ' + date.toLocaleTimeString('ru-RU', {
-      hour: '2-digit',
-      minute: '2-digit'
     });
   };
 
@@ -182,7 +216,6 @@ const MigrationRequestsPage: React.FC = () => {
     <Container fluid className="px-4">
       <AppBreadcrumbs items={breadcrumbItems} />
       
-      {/* Отображение ошибок и успешных сообщений */}
       {error && (
         <Row className="mb-3">
           <Col>
@@ -214,7 +247,6 @@ const MigrationRequestsPage: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Фильтры */}
       <Row className="mb-4">
         <Col>
           <Card className="shadow-sm">
@@ -244,7 +276,7 @@ const MigrationRequestsPage: React.FC = () => {
                       <Form.Control
                         type="date"
                         name="start_date"
-                        value={localFilters.start_date}
+                        value={localFilters.start_date || getCurrentDate()}
                         onChange={handleFilterChange}
                       />
                     </Form.Group>
@@ -256,7 +288,7 @@ const MigrationRequestsPage: React.FC = () => {
                       <Form.Control
                         type="date"
                         name="end_date"
-                        value={localFilters.end_date}
+                        value={localFilters.end_date || getCurrentDate()}
                         onChange={handleFilterChange}
                       />
                     </Form.Group>
@@ -307,7 +339,6 @@ const MigrationRequestsPage: React.FC = () => {
         </Row>
       ) : (
         <>
-          {/* Информация о количестве заявок */}
           <Row className="mb-3">
             <Col>
               <p className="text-muted">
@@ -330,7 +361,7 @@ const MigrationRequestsPage: React.FC = () => {
                       <th>Дата создания</th>
                       <th>Дата формирования</th>
                       <th>Дата завершения</th>
-                      <th>Клиент</th>
+                      {isStaff && <th>Клиент</th>}
                       {isStaff && <th>Менеджер</th>}
                       <th>Объем данных</th>
                       <th>Время миграции</th>
@@ -359,9 +390,11 @@ const MigrationRequestsPage: React.FC = () => {
                           <td className="align-middle">
                             {formatDate(request.completion_datetime || null)}
                           </td>
+                          {isStaff && (
                           <td className="align-middle">
                             {request.client_username || 'Неизвестно'}
                           </td>
+                          )}
                           {isStaff && (
                             <td className="align-middle">
                               {request.manager_username || 'Не назначен'}
@@ -384,7 +417,6 @@ const MigrationRequestsPage: React.FC = () => {
                                 <i className="bi bi-eye"></i>
                               </Link>
                               
-                              {/* Кнопки модератора */}
                               {isStaff && request.status === 'FORMED' && (
                                 <>
                                   <Button 

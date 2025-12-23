@@ -72,7 +72,6 @@ export const addMethodToDraft = createAsyncThunk(
   'migrationRequests/addMethodToDraft',
   async (methodId: number, { rejectWithValue, dispatch }) => {
     try {
-      console.log('Добавление метода в черновик:', methodId);
       const response = await api.migrationMethods.migrationMethodsDraftCreate(methodId.toString());
       const data = response.data as any;
 
@@ -130,8 +129,6 @@ export const updateMethodInRequest = createAsyncThunk(
     bandwidth: string 
   }, { rejectWithValue }) => {
     try {
-      console.log('Обновление метода в заявке (migration_method):', { requestId, methodId, bandwidth });
-      
       const response = await api.migrationRequests.migrationRequestsMethodsUpdate(
         requestId,
         methodId,
